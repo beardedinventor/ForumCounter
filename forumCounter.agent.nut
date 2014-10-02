@@ -1,17 +1,29 @@
 FORUMS_URL <- "http://forums.electricimp.com";
 TOKEN_STRING <- null;
 
-// set to your username
-USER <- "beardedinventor";
-
-data <- server.load();
+// username and password (set through http request to agent)
+USER <- null;
 PW <- null;
 
-// load password if applicable
+data <- server.load();
+
+// load username / password
 if ("pw" in data) {
     PW = data.pw;  
     server.log("Loaded Password")
+} else {
+	data["pw"] <- null;
+	server.save(data);
 }
+
+if ("user" in data) {
+    USER = data.user;
+    server.log("Loaded User")
+} else {
+	data["user"] <- null;
+	server.save(data);
+}
+
 
 // gets posts
 function getNewPosts(url, tokenString, cb) {
@@ -75,15 +87,20 @@ function pollForums() {
 device.on("refresh", update);
 
 http.onrequest(function(req, resp) {
-    if ("pw" in req.query) {
-        PW = req.query["pw"];
-        server.log("Set Password");
-        
-        // save password
-        local data = server.load();
-        data["pw"] <- PW;
-        server.save(data);
-    }
-    resp.send(200, "OK");
+    local path = req.path.tolower();
+	if (path == "/login" || path == "/login/") {
+	    if ("pw" in req.query) {
+    	    PW = req.query["pw"];
+        	server.log("Set Password");
+	    }
+    	if ("user" in req.query) {
+        	USER = req.query["user"];
+	        server.log("Set User");
+    	}
+		data.user = USER;
+		data.pw = PW;
+		server.save(data);
+	}
+	resp.send(200, "OK");
 });
 
