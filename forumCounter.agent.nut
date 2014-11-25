@@ -54,7 +54,7 @@ function getNewPosts(url, tokenString, cb) {
 // sets user token
 function login() {
     if (USER != null && PW != null) {
-        local url = "https://ide.electricimp.com/account/login";
+        local url = "https://api.electricimp.com/account/login";
         local headers = { "Content-Type": "application/json" };
         local body = http.jsonencode({email=USER, password=PW});
         local resp = http.post(url, headers, body).sendsync(); 
