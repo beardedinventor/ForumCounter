@@ -1,4 +1,4 @@
-FORUMS_URL <- "http://forums.electricimp.com";
+FORUMS_URL <- "https://forums.electricimp.com";
 TOKEN_STRING <- null;
 
 // username and password (set through http request to agent)
@@ -36,11 +36,10 @@ function getNewPosts(url, tokenString, cb) {
         local totalNew = 0;
         if (resp.statuscode == 200) {
             local html = resp.body;
-            local ex = regexp(@"<strong>\s*\d+\s*[nN]ew\s*</strong>");
+            local ex = regexp("new\" class=\"Number\">[0-9]+</span>");
             local r = ex.capture(html);
             while (r) {
-                local count = strip(html.slice(r[0].begin+8, r[0].end-12)).tointeger();
-                
+                local count = strip(html.slice(r[0].begin+20, r[0].end-7)).tointeger();
                 newComments += count;
                 activeThreads++
                 
@@ -103,4 +102,3 @@ http.onrequest(function(req, resp) {
 	}
 	resp.send(200, "OK");
 });
-
